@@ -4,7 +4,7 @@ A containerized worker setup with RabbitMQ as job queue. The API receives new me
 
 ## Usage
 
-Pull the repository and install dependencies for the API service as well as for the worker service with `go get` then start the containers with `docker-compose up --build`.
+Pull the repository and add the corresponding `.env` files to the two services. Install dependencies of each of the service with `go get`. Afterwards, start the containers with `docker-compose up --build`.
 
 ## Enqueue Jobs
 
