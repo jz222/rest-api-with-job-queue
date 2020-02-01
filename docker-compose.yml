@@ -1,0 +1,51 @@
+version: "3.4"
+
+services:
+    rabbitmq:
+        image: rabbitmq:3-management
+        hostname: rabbitmq
+        ports:
+            - "2800:15672"
+            - "2801:5672"
+        restart: always
+        healthcheck:
+            test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+            interval: 10s
+            timeout: 10s
+            retries: 3
+        volumes:
+            - ./data:/var/lib/rabbitmq/mnesia/
+
+    api:
+        build: ./api
+        ports:
+            - 2500:2500
+        restart: always
+        healthcheck:
+            test: curl http://127.0.0.1:2500/healthcheck -s -f -o /dev/null || exit 1
+            interval: 10s
+            timeout: 10s
+            retries: 3
+        links:
+            - rabbitmq
+        depends_on:
+            - rabbitmq
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+
+    worker:
+        build: ./worker
+        ports:
+            - "2700:2500"
+        restart: always
+        healthcheck:
+            test: curl http://127.0.0.1:2500/healthcheck -s -f -o /dev/null || exit 1
+            interval: 10s
+            timeout: 10s
+            retries: 3
+        links:
+            - rabbitmq
+        depends_on:
+            - rabbitmq
+        volumes:
+                - /var/run/docker.sock:/var/run/docker.sock
